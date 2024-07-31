@@ -32,10 +32,10 @@ public class Warranty {
     private Blob receiptImage;
 
     private String description;
-    
+
     private String reference;
 
     @ManyToOne
-    private User userId;
+    private User user;
 
 }
