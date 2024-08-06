@@ -29,6 +29,6 @@ public class User {
     @NotBlank
     private String password;
 
-    @OneToMany(mappedBy = "userId")
+    @OneToMany(mappedBy = "user")
     List<Warranty> warranties;
 }
