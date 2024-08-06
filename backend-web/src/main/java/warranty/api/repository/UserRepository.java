@@ -13,7 +13,6 @@ public interface UserRepository extends JpaRepository<User, Long> {
         FROM User u
         WHERE u.id = :id
        """)
-    UserDto findByIdDto(Long Id);
-
-
+    UserDto findByIdDto(Long id);
 }
+
