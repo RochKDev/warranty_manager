@@ -1,4 +1,4 @@
-package warranty.api.model.dto;
+package warranty.api.model.compositeKeys;
 
 
 import jakarta.persistence.Embeddable;
