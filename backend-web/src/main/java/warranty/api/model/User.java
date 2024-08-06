@@ -29,6 +29,7 @@ public class User {
     @NotBlank
     private String password;
 
-    @OneToMany(mappedBy = "user")
-    List<Warranty> warranties;
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
+    private List<ProofOfPurchase> proofOfPurchases;
+
 }

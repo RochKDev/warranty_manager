@@ -6,14 +6,14 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.time.LocalDate;
-import java.sql.Blob;
+import java.util.List;
+
 
 @Entity
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class Warranty {
+public class Product {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -22,20 +22,9 @@ public class Warranty {
     @NotBlank
     private String name;
 
-    @NotBlank
-    private String shopName;
-
-    private LocalDate buyDate;
-
-    private LocalDate endDate;
-    @Lob
-    private Blob receiptImage;
-
     private String description;
 
-    private String reference;
-
     @ManyToOne
-    private User user;
+    private ProofOfPurchase proofOfPurchase;
 
 }
