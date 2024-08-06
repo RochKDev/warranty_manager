@@ -2,6 +2,7 @@ package warranty.api.services.impl;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import warranty.api.exception.ProofOfPurchaseNotFound;
 import warranty.api.model.ProofOfPurchase;
 import warranty.api.model.dto.ProofOfPurchaseId;
 import warranty.api.repository.ProofOfPurchaseRepository;
@@ -39,6 +40,16 @@ public class ProofOfPurchaseServiceImpl implements ProofOfPurchaseService {
     public void deleteById(final ProofOfPurchaseId proofOfPurchaseId){
         log.info("Deleting proof of purchase with id {}", proofOfPurchaseId);
         proofOfPurchaseRepository.deleteById(proofOfPurchaseId);
+    }
+    @Override
+    public ProofOfPurchase update(final ProofOfPurchaseId proofOfPurchaseId, final ProofOfPurchase proofOfPurchase){
+        proofOfPurchase.setProofOfPurchaseId(proofOfPurchaseId);
+
+        if (!proofOfPurchaseRepository.existsById(proofOfPurchaseId)) {
+            throw new ProofOfPurchaseNotFound("Proof of purchase with id " + proofOfPurchaseId + " not found");
+        }
+        log.info("Updating proof of purchase with id {}", proofOfPurchaseId);
+        return proofOfPurchaseRepository.save(proofOfPurchase);
     }
 }
 
