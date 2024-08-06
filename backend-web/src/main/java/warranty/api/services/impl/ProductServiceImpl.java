@@ -3,8 +3,12 @@ package warranty.api.services.impl;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import warranty.api.exception.ProductNotFoundException;
+import warranty.api.exception.ProofOfPurchaseNotFound;
 import warranty.api.model.Product;
+import warranty.api.model.ProofOfPurchase;
+import warranty.api.model.dto.ProductDto;
 import warranty.api.repository.ProductRepository;
+import warranty.api.repository.ProofOfPurchaseRepository;
 import warranty.api.services.ProductService;
 
 import java.util.List;
@@ -16,13 +20,28 @@ public class ProductServiceImpl implements ProductService {
 
     private final ProductRepository productRepository;
 
-    public ProductServiceImpl(ProductRepository productRepository){
+    private final ProofOfPurchaseRepository proofOfPurchaseRepository;
+
+    public ProductServiceImpl(ProductRepository productRepository, ProofOfPurchaseRepository proofOfPurchaseRepository){
         this.productRepository = productRepository;
+        this.proofOfPurchaseRepository = proofOfPurchaseRepository;
     }
 
     @Override
-    public Product save(Product product) {
-        log.info("Saving product with id {}", product.getId());
+    public Product save(ProductDto productDto) {
+        // Fetch the ProofOfPurchase by its composite key
+        ProofOfPurchase proofOfPurchase = proofOfPurchaseRepository.findById(productDto.proofOfPurchaseId())
+                .orElseThrow(() -> new ProofOfPurchaseNotFound("Proof of purchase with id "
+                        + productDto.proofOfPurchaseId() + " not found"));
+
+        // Convert the ProductDto to a Product
+        Product product = Product.builder()
+                .name(productDto.name())
+                .description(productDto.description())
+                .proofOfPurchase(proofOfPurchase)
+                .build();
+
+        log.info("Saving product with name {}", product.getName());
         return productRepository.save(product);
     }
 

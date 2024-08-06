@@ -4,7 +4,7 @@ import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import warranty.api.model.dto.ProofOfPurchaseId;
+import warranty.api.model.compositeKeys.ProofOfPurchaseId;
 
 import java.sql.Blob;
 import java.time.LocalDate;

@@ -1,7 +1,7 @@
 package warranty.api.services;
 
 import warranty.api.model.ProofOfPurchase;
-import warranty.api.model.dto.ProofOfPurchaseId;
+import warranty.api.model.compositeKeys.ProofOfPurchaseId;
 
 import java.util.List;
 import java.util.Optional;

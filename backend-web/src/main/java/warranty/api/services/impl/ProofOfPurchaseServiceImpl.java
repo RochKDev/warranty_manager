@@ -4,7 +4,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import warranty.api.exception.ProofOfPurchaseNotFound;
 import warranty.api.model.ProofOfPurchase;
-import warranty.api.model.dto.ProofOfPurchaseId;
+import warranty.api.model.compositeKeys.ProofOfPurchaseId;
 import warranty.api.repository.ProofOfPurchaseRepository;
 import warranty.api.services.ProofOfPurchaseService;
 
