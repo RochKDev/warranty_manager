@@ -1,13 +1,12 @@
 package warranty.api.model;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-
-import java.util.List;
 
 
 @Entity
@@ -26,6 +25,7 @@ public class Product {
 
     private String description;
 
+    @JsonBackReference
     @ManyToOne
     private ProofOfPurchase proofOfPurchase;
 
