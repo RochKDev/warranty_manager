@@ -29,7 +29,8 @@ public class User {
     @NotBlank
     private String password;
 
-    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
-    private List<ProofOfPurchase> proofOfPurchases;
+//    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
+//    private List<ProofOfPurchase> proofOfPurchases;//TODO decoment after tests
+
 
 }

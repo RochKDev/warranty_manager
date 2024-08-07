@@ -1,37 +1,48 @@
 package warranty.api.model;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import warranty.api.model.compositeKeys.ProofOfPurchaseId;
 
-import java.sql.Blob;
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
+@Builder
+@Table(
+        uniqueConstraints = @UniqueConstraint(columnNames = {"shopName", "reference"})
+)
 public class ProofOfPurchase {
 
-    @EmbeddedId
-    ProofOfPurchaseId proofOfPurchaseId;
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
+    private String shopName;
+
+    private String reference;
 
     private LocalDate buyDate;
 
     private LocalDate warrantyEndDate;
 
-    @Lob
-    private Blob receiptImage;
+//    @Lob
+//    private Blob receiptImage;
 
     private String description;
 
-    @ManyToOne
-    User user;
+//    @ManyToOne
+//    User user; // TODO uncomment after tests
 
+    @JsonManagedReference
     @OneToMany(mappedBy = "proofOfPurchase", cascade = CascadeType.ALL)
-    private List<Product> products;
+    private List<Product> products = new ArrayList<>();
 
 }
