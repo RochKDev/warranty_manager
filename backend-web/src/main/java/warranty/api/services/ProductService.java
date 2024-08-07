@@ -10,13 +10,15 @@ public interface ProductService {
 
     Product save(final ProductDto productDto);
 
+    List<Product> findAll();
+
     List<Product> findByShopNameAndReference(final String shopName, final String reference);
 
-    List<Product> findByUserId(final Long userId);
+//    List<Product> findByUserId(final Long userId);
 
-    Optional<Product> findOne(final Long id);
+    Product findOne(final Long id);
 
-    Product update(final Long id, Product product);
+    Product update(final Long id, ProductDto productDto);
 
     void deleteById(final Long id);
 }
