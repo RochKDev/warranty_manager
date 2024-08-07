@@ -10,5 +10,5 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
 
     List<Product> findByProofOfPurchase_ShopNameAndProofOfPurchase_Reference(String shopName, String reference);
 
-    List<Product> findByProofOfPurchase_User_Id(Long userId);
+//    List<Product> findByProofOfPurchase_User_Id(Long userId);
 }
