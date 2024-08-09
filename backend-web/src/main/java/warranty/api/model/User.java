@@ -13,6 +13,7 @@ import java.util.List;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
+// TODO Implement authentication
 public class User {
 
     @Id
@@ -30,7 +31,7 @@ public class User {
     private String password;
 
 //    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
-//    private List<ProofOfPurchase> proofOfPurchases;//TODO decoment after tests
+//    private List<ProofOfPurchase> proofOfPurchases;
 
 
 }
