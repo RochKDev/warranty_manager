@@ -1,6 +1,5 @@
 package warranty.api.model;
 
-import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -34,14 +33,13 @@ public class ProofOfPurchase {
     private LocalDate warrantyEndDate;
 
 //    @Lob
-//    private Blob receiptImage;
+//    private Blob receiptImage; // TODO implement file upload
 
     private String description;
 
 //    @ManyToOne
-//    User user; // TODO uncomment after tests
+//    User user; // TODO implement authentication
 
-    @JsonManagedReference
     @OneToMany(mappedBy = "proofOfPurchase", cascade = CascadeType.ALL)
     private List<Product> products = new ArrayList<>();
 
