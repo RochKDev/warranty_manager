@@ -2,23 +2,24 @@ package warranty.api.services;
 
 import warranty.api.model.Product;
 import warranty.api.model.dto.ProductDto;
+import warranty.api.model.responses.ProductResponseDto;
 
 import java.util.List;
 import java.util.Optional;
 
 public interface ProductService {
 
-    Product save(final ProductDto productDto);
+    ProductResponseDto save(final ProductDto productDto);
 
-    List<Product> findAll();
+    List<ProductResponseDto> findAll();
 
-    List<Product> findByShopNameAndReference(final String shopName, final String reference);
+    List<ProductResponseDto> findByShopNameAndReference(final String shopName, final String reference);
 
 //    List<Product> findByUserId(final Long userId);
 
-    Product findOne(final Long id);
+    ProductResponseDto findOneById(final Long id);
 
-    Product update(final Long id, ProductDto productDto);
+    ProductResponseDto update(final Long id, ProductDto productDto);
 
     void deleteById(final Long id);
 }
