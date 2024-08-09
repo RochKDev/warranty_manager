@@ -1,13 +1,16 @@
 package warranty.api.services;
 
-import warranty.api.model.ProofOfPurchase;
 import warranty.api.model.dto.ProofOfPurchaseDto;
+import warranty.api.model.responses.ProofOfPurchaseResponseDto;
+
+import java.util.List;
 
 public interface ProofOfPurchaseService {
-    ProofOfPurchase save(final ProofOfPurchaseDto proofOfPurchaseDto);
-    ProofOfPurchase findOneById(final Long id);
-    ProofOfPurchase findOneByShopNameAndReference(final String shopName, final String reference);
+    ProofOfPurchaseResponseDto save(final ProofOfPurchaseDto proofOfPurchaseDto);
+    List<ProofOfPurchaseResponseDto> findAll();
+    ProofOfPurchaseResponseDto findOneById(final Long id);
+    ProofOfPurchaseResponseDto findOneByShopNameAndReference(final String shopName, final String reference);
 //    List<ProofOfPurchase> findAll(final Long userId);
     void deleteById(final Long id);
-    ProofOfPurchase update(final Long id, final ProofOfPurchaseDto proofOfPurchaseDto);
+    ProofOfPurchaseResponseDto update(final Long id, final ProofOfPurchaseDto proofOfPurchaseDto);
 }

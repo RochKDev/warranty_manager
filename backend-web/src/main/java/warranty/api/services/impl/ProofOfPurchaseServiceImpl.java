@@ -7,6 +7,7 @@ import warranty.api.exception.ProofOfPurchaseNotFoundException;
 import warranty.api.model.Product;
 import warranty.api.model.ProofOfPurchase;
 import warranty.api.model.dto.ProofOfPurchaseDto;
+import warranty.api.model.responses.ProofOfPurchaseResponseDto;
 import warranty.api.repository.ProofOfPurchaseRepository;
 import warranty.api.services.ProofOfPurchaseService;
 
@@ -19,19 +20,18 @@ import java.util.Optional;
 public class ProofOfPurchaseServiceImpl implements ProofOfPurchaseService {
     private final ProofOfPurchaseRepository proofOfPurchaseRepository;
 
-    public ProofOfPurchaseServiceImpl(final ProofOfPurchaseRepository proofOfPurchaseRepository){
+    public ProofOfPurchaseServiceImpl(final ProofOfPurchaseRepository proofOfPurchaseRepository) {
         this.proofOfPurchaseRepository = proofOfPurchaseRepository;
     }
 
     @Override
-    public ProofOfPurchase save(final ProofOfPurchaseDto proofOfPurchaseDto) {
-
-        // Check if shopName and same reference exists
+    public ProofOfPurchaseResponseDto save(final ProofOfPurchaseDto proofOfPurchaseDto) {
+        // Get eventual proof of purchase with same shop name and reference
         Optional<ProofOfPurchase> existingProofOfPurchase =
                 proofOfPurchaseRepository.findOneByShopNameAndReference(proofOfPurchaseDto.shopName(),
                         proofOfPurchaseDto.reference());
-
-        if(existingProofOfPurchase.isPresent()){
+        // Check if a proof of purchase with the same shop name and reference already exists
+        if (existingProofOfPurchase.isPresent()) {
             throw new ProofOfPurchaseConflictException("Proof of purchase with shop name " + proofOfPurchaseDto.shopName() +
                     " and reference " + proofOfPurchaseDto.reference() + " already exists");
         }
@@ -62,12 +62,24 @@ public class ProofOfPurchaseServiceImpl implements ProofOfPurchaseService {
         proofOfPurchase.setProducts(productList);
 
         log.info("Saving new proof of purchase");
-        // Return the saved ProofOfPurchase entity (and cascade the save to the associated Product entities)
-        return proofOfPurchaseRepository.save(proofOfPurchase);
+
+        // Save the ProofOfPurchase entity
+        ProofOfPurchase savedProofOfPurchase = proofOfPurchaseRepository.save(proofOfPurchase);
+
+        // Convert the saved entity to a ProofOfPurchaseResponseDto
+        return ProofOfPurchaseResponseDto.fromEntity(savedProofOfPurchase);
     }
 
     @Override
-    public ProofOfPurchase findOneById(final Long id) {
+    public List<ProofOfPurchaseResponseDto> findAll() {
+        log.info("Finding all proof of purchases");
+        return proofOfPurchaseRepository.findAll().stream()
+                .map(ProofOfPurchaseResponseDto::fromEntity)
+                .toList();
+    }
+
+    @Override
+    public ProofOfPurchaseResponseDto findOneById(final Long id) {
         Optional<ProofOfPurchase> proofOfPurchase = proofOfPurchaseRepository.findById(id);
 
         if (proofOfPurchase.isEmpty()) {
@@ -75,11 +87,11 @@ public class ProofOfPurchaseServiceImpl implements ProofOfPurchaseService {
         }
 
         log.info("Finding proof of purchase with id {}", id);
-        return proofOfPurchase.get();
+        return ProofOfPurchaseResponseDto.fromEntity(proofOfPurchase.get());
     }
 
     @Override
-    public ProofOfPurchase findOneByShopNameAndReference(String shopName, String reference) {
+    public ProofOfPurchaseResponseDto findOneByShopNameAndReference(String shopName, String reference) {
         Optional<ProofOfPurchase> proofOfPurchase = proofOfPurchaseRepository.findOneByShopNameAndReference(shopName, reference);
 
         if (proofOfPurchase.isEmpty()) {
@@ -87,48 +99,43 @@ public class ProofOfPurchaseServiceImpl implements ProofOfPurchaseService {
         }
 
         log.info("Finding proof of purchase with shop name {} and reference {}", shopName, reference);
-        return proofOfPurchase.get();
+        return ProofOfPurchaseResponseDto.fromEntity(proofOfPurchase.get());
     }
 
-
-    //    @Override
-//    public List<ProofOfPurchase> findAll(final Long userId) {
-//        log.info("Finding all proof of purchases for user with id {}", userId);
-//        return proofOfPurchaseRepository.findByUser_Id(userId);
-//    }
     @Override
-    public void deleteById(final Long id){
+    public void deleteById(final Long id) {
         log.info("Deleting proof of purchase with id {}", id);
         proofOfPurchaseRepository.deleteById(id);
     }
+
     @Override
-    public ProofOfPurchase update(final Long id, final ProofOfPurchaseDto proofOfPurchaseDto){
+    public ProofOfPurchaseResponseDto update(final Long id, final ProofOfPurchaseDto proofOfPurchaseDto) {
 
         Optional<ProofOfPurchase> proofOfPurchase = proofOfPurchaseRepository.findById(id);
 
-        if(proofOfPurchase.isEmpty()){
+        if (proofOfPurchase.isEmpty()) {
             throw new ProofOfPurchaseNotFoundException("Proof of purchase with id " + id + " not found");
         }
 
-        ProofOfPurchase existingProofOfPurchase = getProofOfPurchase(proofOfPurchaseDto, proofOfPurchase);
+        ProofOfPurchase existingProofOfPurchase = updateProofOfPurchase(proofOfPurchaseDto, proofOfPurchase.get());
 
         log.info("Updating proof of purchase with id {}", id);
-        return proofOfPurchaseRepository.save(existingProofOfPurchase);
+
+        // Save the updated entity
+        ProofOfPurchase updatedProofOfPurchase = proofOfPurchaseRepository.save(existingProofOfPurchase);
+
+        // Convert to response DTO and return
+        return ProofOfPurchaseResponseDto.fromEntity(updatedProofOfPurchase);
     }
 
-    // TODO add case specific update (eg. update description). Partial update.
-
-    private static ProofOfPurchase getProofOfPurchase(ProofOfPurchaseDto proofOfPurchaseDto, Optional<ProofOfPurchase> proofOfPurchase) {
-        ProofOfPurchase existingProofOfPurchase = proofOfPurchase.get();
-
-        existingProofOfPurchase.setBuyDate(proofOfPurchaseDto.buyDate());
-        existingProofOfPurchase.setDescription(proofOfPurchaseDto.description());
-        //existingProofOfPurchase.setReceiptImage(proofOfPurchaseDto.receiptImage());
-        existingProofOfPurchase.setWarrantyEndDate(proofOfPurchaseDto.warrantyEndDate());
-        existingProofOfPurchase.setShopName(proofOfPurchaseDto.shopName());
-        existingProofOfPurchase.setReference(proofOfPurchaseDto.reference());
-        return existingProofOfPurchase;
+    // Helper method to update the existing entity with new data from DTO
+    private ProofOfPurchase updateProofOfPurchase(ProofOfPurchaseDto proofOfPurchaseDto, ProofOfPurchase proofOfPurchase) {
+        proofOfPurchase.setBuyDate(proofOfPurchaseDto.buyDate());
+        proofOfPurchase.setDescription(proofOfPurchaseDto.description());
+        //proofOfPurchase.setReceiptImage(proofOfPurchaseDto.receiptImage());
+        proofOfPurchase.setWarrantyEndDate(proofOfPurchaseDto.warrantyEndDate());
+        proofOfPurchase.setShopName(proofOfPurchaseDto.shopName());
+        proofOfPurchase.setReference(proofOfPurchaseDto.reference());
+        return proofOfPurchase;
     }
-
 }
-
