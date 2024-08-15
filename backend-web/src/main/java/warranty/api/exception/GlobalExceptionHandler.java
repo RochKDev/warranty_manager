@@ -56,4 +56,34 @@ public class GlobalExceptionHandler {
                 ZonedDateTime.now()
         );
     }
+
+    @ResponseStatus(HttpStatus.CONFLICT)
+    @ExceptionHandler(value = UserEmailUnavailableException.class)
+    public ApiErrorResponse handleUserEmailUnavailable(UserEmailUnavailableException ex,
+                                                       HttpServletRequest request,
+                                                       HandlerMethod method) {
+
+        return new ApiErrorResponse(
+                HttpStatus.CONFLICT,
+                ex.getMessage(),
+                request.getRequestURI(),
+                method.getMethod().getName(),
+                ZonedDateTime.now()
+        );
+    }
+
+    @ResponseStatus(HttpStatus.NOT_FOUND)
+    @ExceptionHandler(value = UserEmailNotFoundException.class)
+    public ApiErrorResponse handleUserEmailNotFound(UserEmailNotFoundException ex,
+                                                    HttpServletRequest request,
+                                                    HandlerMethod method) {
+
+        return new ApiErrorResponse(
+                HttpStatus.NOT_FOUND,
+                ex.getMessage(),
+                request.getRequestURI(),
+                method.getMethod().getName(),
+                ZonedDateTime.now()
+        );
+    }
 }

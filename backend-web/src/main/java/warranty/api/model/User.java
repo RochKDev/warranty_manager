@@ -3,6 +3,7 @@ package warranty.api.model;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import jakarta.validation.constraints.NotBlank;
@@ -13,7 +14,7 @@ import java.util.List;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-// TODO Implement authentication
+@Builder
 public class User {
 
     @Id
@@ -25,6 +26,7 @@ public class User {
 
     @Email
     @NotBlank
+    @Column(unique = true)
     private String email;
 
     @NotBlank

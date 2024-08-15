@@ -1,13 +1,9 @@
 package warranty.api.model.dto;
 
+import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 
-import jakarta.validation.constraints.Email;
-
-public record UserDto (
-
-        @NotBlank(message = "Name is required")
-        String name,
+public record LoginRequestDto(
 
         @NotBlank(message = "Email is required")
         @Email(message = "Email is invalid")
@@ -15,4 +11,5 @@ public record UserDto (
 
         @NotBlank(message = "Password is required")
         String password
-) {}
+
+) { }

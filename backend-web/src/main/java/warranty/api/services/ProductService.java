@@ -1,11 +1,9 @@
 package warranty.api.services;
 
-import warranty.api.model.Product;
 import warranty.api.model.dto.ProductDto;
 import warranty.api.model.responses.ProductResponseDto;
 
 import java.util.List;
-import java.util.Optional;
 
 public interface ProductService {
 
