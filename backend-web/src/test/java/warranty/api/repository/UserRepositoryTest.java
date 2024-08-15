@@ -1,0 +1,76 @@
+package warranty.api.repository;
+
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
+import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
+import org.testcontainers.junit.jupiter.Testcontainers;
+import warranty.api.AbstractTestcontainersTest;
+import warranty.api.model.User;
+
+import java.util.Optional;
+
+import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
+import static org.junit.jupiter.api.Assertions.*;
+
+
+@DataJpaTest
+@Testcontainers
+@AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
+class UserRepositoryTest extends AbstractTestcontainersTest {
+
+    @Autowired
+    private UserRepository userRepository;
+
+    public static final String EMAIL = "roch.the.glock@gmail.com";
+
+    @BeforeEach
+    void setUp() {
+        User user = User.builder()
+                .name("Roch The Glock")
+                .email(EMAIL)
+                .password("password")
+                .build();
+
+        userRepository.save(user);
+    }
+
+    @AfterEach
+    void tearDown() {
+        userRepository.deleteAll();
+    }
+
+    @Test
+    void shouldReturnUserWhenFindByEmail() {
+        // when
+        Optional<User> userByEmail = userRepository.findByEmail(EMAIL);
+        // then
+        assertTrue(userByEmail.isPresent());
+    }
+
+    @Test
+    void shouldNotReturnUserWhenFindByEmail() {
+        // when
+        Optional<User> userByEmail = userRepository.findByEmail("test@gmail.com");
+        // then
+        assertThat(userByEmail).isNotPresent();
+    }
+
+    @Test
+    void shouldReturnTrueWhenExistsByEmail() {
+        // when
+        boolean existsByEmail = userRepository.existsByEmail(EMAIL);
+        // then
+        assertTrue(existsByEmail);
+    }
+
+    @Test
+    void shouldReturnFalseWhenExistsByEmail() {
+        // when
+        boolean existsByEmail = userRepository.existsByEmail("test@gmail.com");
+        // then
+        assertFalse(existsByEmail);
+    }
+}
