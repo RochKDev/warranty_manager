@@ -11,6 +11,7 @@ import org.testcontainers.containers.MySQLContainer;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
 import org.testcontainers.utility.DockerImageName;
+import warranty.api.AbstractTestcontainersTest;
 import warranty.api.model.Product;
 import warranty.api.model.ProofOfPurchase;
 
@@ -18,17 +19,11 @@ import java.time.LocalDate;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.*;
 
 @DataJpaTest
 @Testcontainers
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
-class ProductRepositoryTest {
-
-    @Container
-    @ServiceConnection
-    static MySQLContainer<?> mysqlContainer
-            = new MySQLContainer<>(DockerImageName.parse("mysql:latest"));
+class ProductRepositoryTest extends AbstractTestcontainersTest {
 
     @Autowired
     private ProductRepository productRepository;
@@ -38,12 +33,6 @@ class ProductRepositoryTest {
 
     private static final String SHOP_NAME = "TopAchat";
     private static final String REFERENCE = "12345ABKUYU878";
-
-    @Test
-    void canEstablishConnection() {
-        assertThat(mysqlContainer.isCreated()).isTrue();
-        assertThat(mysqlContainer.isRunning()).isTrue();
-    }
 
     @BeforeEach
     void setUp() {
