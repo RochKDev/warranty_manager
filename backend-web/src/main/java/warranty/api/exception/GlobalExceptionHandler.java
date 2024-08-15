@@ -2,12 +2,17 @@ package warranty.api.exception;
 
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.http.HttpStatus;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.method.HandlerMethod;
+import warranty.api.exception.validation.MessageError;
+import warranty.api.exception.validation.ValidationErrorResponse;
 
 import java.time.ZonedDateTime;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @RestControllerAdvice
 public class GlobalExceptionHandler {
@@ -81,6 +86,24 @@ public class GlobalExceptionHandler {
         return new ApiErrorResponse(
                 HttpStatus.NOT_FOUND,
                 ex.getMessage(),
+                request.getRequestURI(),
+                method.getMethod().getName(),
+                ZonedDateTime.now()
+        );
+    }
+
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    @ExceptionHandler(MethodArgumentNotValidException.class)
+    public ValidationErrorResponse handleValidationExceptions(MethodArgumentNotValidException ex,
+                                                              HttpServletRequest request,
+                                                              HandlerMethod method) {
+        List<MessageError> validationErrors = ex.getBindingResult().getFieldErrors().stream()
+                .map(error -> new MessageError(error.getField(), error.getDefaultMessage()))
+                .collect(Collectors.toList());
+
+        return new ValidationErrorResponse(
+                HttpStatus.BAD_REQUEST,
+                validationErrors,
                 request.getRequestURI(),
                 method.getMethod().getName(),
                 ZonedDateTime.now()

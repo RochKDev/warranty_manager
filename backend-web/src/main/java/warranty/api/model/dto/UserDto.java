@@ -5,7 +5,6 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Email;
 
 public record UserDto (
-
         @NotBlank(message = "Name is required")
         String name,
 
