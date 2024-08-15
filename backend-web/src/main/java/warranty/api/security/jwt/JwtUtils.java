@@ -16,11 +16,17 @@ import warranty.api.security.user.UserDetailsImpl;
 @Slf4j
 public class JwtUtils {
 
-    @Value("${auth.token.secret}")
-    private String jwtSecret;
+    private final String jwtSecret;
 
-    @Value("${auth.token.expirationInMils}")
-    private int jwtExpirationMs;
+    private final int jwtExpirationMs;
+
+    // For testing purposes, we allow the secret and expiration to be set manually,
+    // if not it will be set from the application.properties file
+    public JwtUtils(@Value("${auth.token.secret}") String jwtSecret,
+                    @Value("${auth.token.expirationInMils}") int jwtExpirationMs) {
+        this.jwtSecret = jwtSecret;
+        this.jwtExpirationMs = jwtExpirationMs;
+    }
 
     public String generateJwtTokenForUser(Authentication authentication){
         UserDetailsImpl userPrincipal = (UserDetailsImpl) authentication.getPrincipal();
