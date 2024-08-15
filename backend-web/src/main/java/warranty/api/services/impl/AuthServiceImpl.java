@@ -49,7 +49,7 @@ public class AuthServiceImpl implements AuthService {
 
     @Override
     public void registerUser(UserDto userDto) {
-        if(userRepository.findByEmail(userDto.email()).isPresent()) {
+        if(userRepository.existsByEmail(userDto.email())) {
             log.error("User with email {} already exists", userDto.email());
             throw new UserEmailUnavailableException("User with email " + userDto.email() + " already exists");
         }
