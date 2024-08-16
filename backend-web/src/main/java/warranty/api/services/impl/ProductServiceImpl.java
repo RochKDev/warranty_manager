@@ -1,15 +1,22 @@
 package warranty.api.services.impl;
 
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 import warranty.api.exception.ProductNotFoundException;
 import warranty.api.exception.ProofOfPurchaseNotFoundException;
+import warranty.api.exception.UnauthorizedResourceAccess;
+import warranty.api.exception.UserEmailNotFoundException;
 import warranty.api.model.Product;
 import warranty.api.model.ProofOfPurchase;
+import warranty.api.model.User;
 import warranty.api.model.dto.ProductDto;
 import warranty.api.model.responses.ProductResponseDto;
 import warranty.api.repository.ProductRepository;
 import warranty.api.repository.ProofOfPurchaseRepository;
+import warranty.api.repository.UserRepository;
 import warranty.api.services.ProductService;
 
 import java.util.List;
@@ -22,113 +29,133 @@ public class ProductServiceImpl implements ProductService {
 
     private final ProductRepository productRepository;
     private final ProofOfPurchaseRepository proofOfPurchaseRepository;
+    private final UserRepository userRepository;
 
-    public ProductServiceImpl(ProductRepository productRepository, ProofOfPurchaseRepository proofOfPurchaseRepository) {
+    public ProductServiceImpl(ProductRepository productRepository,
+                              ProofOfPurchaseRepository proofOfPurchaseRepository,
+                              UserRepository userRepository) {
         this.productRepository = productRepository;
         this.proofOfPurchaseRepository = proofOfPurchaseRepository;
+        this.userRepository = userRepository;
     }
 
     @Override
-    public ProductResponseDto save(ProductDto productDto) {
-        // Fetch the ProofOfPurchase by its ID
-        Optional<ProofOfPurchase> proofOfPurchaseOpt = proofOfPurchaseRepository.findById(productDto.proofOfPurchaseId());
+    public ProductResponseDto save(ProductDto productDto, UserDetails userDetails) {
+        User user = getUserFromUserDetails(userDetails);
+        ProofOfPurchase proofOfPurchase = getValidProofOfPurchase(productDto.proofOfPurchaseId(), user);
 
-        if (proofOfPurchaseOpt.isEmpty()) {
-            throw new ProofOfPurchaseNotFoundException("Proof of purchase with id " + productDto.proofOfPurchaseId() + " not found");
-        }
+        Product product = buildProductFromDto(productDto, proofOfPurchase);
 
-        ProofOfPurchase proofOfPurchase = proofOfPurchaseOpt.get();
+        log.debug("Saving product with name {}", product.getName());
 
-        // Convert the ProductDto to a Product entity
-        Product product = Product.builder()
-                .name(productDto.name())
-                .description(productDto.description())
-                .proofOfPurchase(proofOfPurchase)
-                .build();
-
-        log.info("Saving product with name {}", product.getName());
-
-        // Save the product and convert the saved entity to a ProductResponseDto
         Product savedProduct = productRepository.save(product);
 
         return ProductResponseDto.fromEntity(savedProduct);
     }
 
-
     @Override
-    public List<ProductResponseDto> findAll() {
-        log.info("Finding all products");
-        List<Product> products = productRepository.findAll();
+    public Page<ProductResponseDto> findAll(UserDetails userDetails, Pageable pageable) {
+        User user = getUserFromUserDetails(userDetails);
 
-        // Convert the list of Product entities to a list of ProductResponseDto
-        return products.stream()
-                .map(ProductResponseDto::fromEntity)
-                .collect(Collectors.toList());
+        log.debug("Finding all products related to user: {}", user.getEmail());
+
+        return productRepository.findByProofOfPurchase_User_Id(user.getId(), pageable)
+                .map(ProductResponseDto::fromEntity);
     }
 
     @Override
     public List<ProductResponseDto> findByShopNameAndReference(String shopName, String reference) {
-        log.info("Finding products with shop name {} and reference {}", shopName, reference);
-        List<Product> products = productRepository.findByProofOfPurchase_ShopNameAndProofOfPurchase_Reference(shopName, reference);
+        log.debug("Finding products with shop name {} and reference {}", shopName, reference);
 
-        // Convert the list of Product entities to a list of ProductResponseDto
-        return products.stream()
+        return productRepository.findByProofOfPurchase_ShopNameAndProofOfPurchase_Reference(shopName, reference)
+                .stream()
                 .map(ProductResponseDto::fromEntity)
                 .collect(Collectors.toList());
     }
 
     @Override
-    public ProductResponseDto findOneById(Long id) {
-        Optional<Product> product = productRepository.findById(id);
+    public ProductResponseDto findOneById(Long id, UserDetails userDetails) {
+        User user = getUserFromUserDetails(userDetails);
+        Product product = getAuthorizedProduct(id, user);
 
-        if (product.isEmpty()) {
-            throw new ProductNotFoundException("Product with id " + id + " not found");
-        }
+        log.debug("Finding product with id {}", id);
 
-        log.info("Finding product with id {}", id);
-        return ProductResponseDto.fromEntity(product.get());
+        return ProductResponseDto.fromEntity(product);
     }
 
     @Override
-    public ProductResponseDto update(Long id, ProductDto productDto) {
-        // Find the ProofOfPurchase by its ID
-        Optional<ProofOfPurchase> proofOfPurchaseOpt = proofOfPurchaseRepository.findById(productDto.proofOfPurchaseId());
+    public ProductResponseDto update(Long id, ProductDto productDto, UserDetails userDetails) {
+        User user = getUserFromUserDetails(userDetails);
+        ProofOfPurchase proofOfPurchase = getValidProofOfPurchase(productDto.proofOfPurchaseId(), user);
+        Product existingProduct = getAuthorizedProduct(id, user);
 
-        if (proofOfPurchaseOpt.isEmpty()) {
-            throw new ProofOfPurchaseNotFoundException("Proof of purchase with id " + productDto.proofOfPurchaseId() + " not found");
-        }
+        updateProductFromDto(existingProduct, productDto, proofOfPurchase);
 
-        ProofOfPurchase proofOfPurchase = proofOfPurchaseOpt.get();
+        log.debug("Updating product with id {}", id);
 
-        // Find the Product by its ID
-        Optional<Product> existingProductOpt = productRepository.findById(id);
-
-        if (existingProductOpt.isEmpty()) {
-            throw new ProductNotFoundException("Product with id " + id + " not found");
-        }
-
-        Product existingProduct = existingProductOpt.get();
-
-        // Update the Product entity with data from the DTO
-        existingProduct.setName(productDto.name());
-        existingProduct.setDescription(productDto.description());
-        existingProduct.setProofOfPurchase(proofOfPurchase);
-
-        log.info("Updating product with id {}", id);
-
-        // Save the updated Product entity and convert it to a ProductResponseDto
         Product updatedProduct = productRepository.save(existingProduct);
 
         return ProductResponseDto.fromEntity(updatedProduct);
     }
 
     @Override
-    public void deleteById(Long id) {
-        if (!productRepository.existsById(id)) {
-            throw new ProductNotFoundException("Product with id " + id + " not found");
-        }
+    public void deleteById(Long id, UserDetails userDetails) {
+        User user = getUserFromUserDetails(userDetails);
+        Product product = getAuthorizedProduct(id, user);
 
-        log.info("Deleting product with id {}", id);
+        log.debug("Deleting product with id {}", id);
+
         productRepository.deleteById(id);
+    }
+
+    // Helper method to get user from UserDetails
+    private User getUserFromUserDetails(UserDetails userDetails) {
+        Optional<User> userOpt = userRepository.findByEmail(userDetails.getUsername());
+        if (userOpt.isEmpty()) {
+            throw new UserEmailNotFoundException("User with email " + userDetails.getUsername() + " not found");
+        }
+        return userOpt.get();
+    }
+
+    // Helper method to get valid proof of purchase, it checks if the proof of purchase belongs to the user and it exists
+    private ProofOfPurchase getValidProofOfPurchase(Long proofOfPurchaseId, User user) {
+        Optional<ProofOfPurchase> proofOfPurchaseOpt = proofOfPurchaseRepository.findById(proofOfPurchaseId);
+        if (proofOfPurchaseOpt.isEmpty()) {
+            throw new ProofOfPurchaseNotFoundException("Proof of purchase with id " + proofOfPurchaseId + " not found");
+        }
+        ProofOfPurchase proofOfPurchase = proofOfPurchaseOpt.get();
+        if (!proofOfPurchase.getUser().getId().equals(user.getId())) {
+            throw new UnauthorizedResourceAccess("You are not authorized to access this proof of purchase.");
+        }
+        return proofOfPurchase;
+    }
+
+    // Helper method to get product by id and check if the user is authorized to access it
+    private Product getAuthorizedProduct(Long productId, User user) {
+        Optional<Product> productOpt = productRepository.findById(productId);
+        if (productOpt.isEmpty()) {
+            throw new ProductNotFoundException("Product with id " + productId + " not found");
+        }
+        Product product = productOpt.get();
+        if (!product.getProofOfPurchase().getUser().getId().equals(user.getId())) {
+            throw new UnauthorizedResourceAccess("You are not authorized to access this product.");
+        }
+        return product;
+    }
+
+    // Helper method to build product from DTO
+    private Product buildProductFromDto(ProductDto productDto, ProofOfPurchase proofOfPurchase) {
+        return Product.builder()
+                .name(productDto.name())
+                .description(productDto.description())
+                .proofOfPurchase(proofOfPurchase)
+                .build();
+    }
+
+    // Helper method to update product from DTO
+    private void updateProductFromDto(Product product, ProductDto productDto, ProofOfPurchase proofOfPurchase) {
+        product.setName(productDto.name());
+        product.setDescription(productDto.description());
+        product.setProofOfPurchase(proofOfPurchase);
     }
 }
