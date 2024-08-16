@@ -1,6 +1,8 @@
 package warranty.api.services.impl;
 
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 import warranty.api.exception.ProofOfPurchaseConflictException;
@@ -84,14 +86,13 @@ public class ProofOfPurchaseServiceImpl implements ProofOfPurchaseService {
     }
 
     @Override
-    public List<ProofOfPurchaseResponseDto> findAll(UserDetails userDetails) {
+    public Page<ProofOfPurchaseResponseDto> findAll(Pageable pageable, UserDetails userDetails) {
         User existingUser = getUserFromUserDetails(userDetails);
 
         log.info("Finding all proof of purchases related to user : {}", existingUser.getEmail());
 
-        return proofOfPurchaseRepository.findByUser_Id(existingUser.getId()).stream()
-                .map(ProofOfPurchaseResponseDto::fromEntity)
-                .toList();
+        return proofOfPurchaseRepository.findByUser_Id(existingUser.getId(), pageable)
+                .map(ProofOfPurchaseResponseDto::fromEntity);
     }
 
     @Override

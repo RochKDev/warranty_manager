@@ -1,7 +1,9 @@
 package warranty.api.services;
 
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.userdetails.UserDetails;
 import warranty.api.model.dto.ProofOfPurchaseDto;
+import org.springframework.data.domain.Page;
 import warranty.api.model.responses.ProofOfPurchaseResponseDto;
 
 import java.util.List;
@@ -10,7 +12,7 @@ public interface ProofOfPurchaseService {
 
     ProofOfPurchaseResponseDto save(final ProofOfPurchaseDto proofOfPurchaseDto, UserDetails userDetails);
 
-    List<ProofOfPurchaseResponseDto> findAll(UserDetails userDetails);
+    Page<ProofOfPurchaseResponseDto> findAll(Pageable pageable, UserDetails userDetails);
 
     ProofOfPurchaseResponseDto findOneById(final Long id, UserDetails userDetails);
 

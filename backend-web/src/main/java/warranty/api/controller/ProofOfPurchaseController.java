@@ -1,5 +1,7 @@
 package warranty.api.controller;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -29,8 +31,9 @@ public class ProofOfPurchaseController {
     }
 
     @GetMapping
-    public ResponseEntity<List<ProofOfPurchaseResponseDto>> getAll(@AuthenticationPrincipal UserDetails userDetails) {
-        return new ResponseEntity<>(proofOfPurchaseService.findAll(userDetails), HttpStatus.OK);
+    public ResponseEntity<Page<ProofOfPurchaseResponseDto>> getAll(@AuthenticationPrincipal UserDetails userDetails,
+                                                                   Pageable pageable) {
+        return new ResponseEntity<>(proofOfPurchaseService.findAll(pageable, userDetails), HttpStatus.OK);
     }
 
     @GetMapping(path = "/{id}")
