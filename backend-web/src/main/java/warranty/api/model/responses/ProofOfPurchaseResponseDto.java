@@ -12,6 +12,7 @@ public record ProofOfPurchaseResponseDto(
         LocalDate buyDate,
         LocalDate warrantyEndDate,
         String description,
+        Long userId,
         List<ProductResponseDto> products
 ) {
     public static ProofOfPurchaseResponseDto fromEntity(ProofOfPurchase proofOfPurchase) {
@@ -28,6 +29,7 @@ public record ProofOfPurchaseResponseDto(
                 proofOfPurchase.getBuyDate(),
                 proofOfPurchase.getWarrantyEndDate(),
                 proofOfPurchase.getDescription(),
+                proofOfPurchase.getUser().getId(),
                 productDtos
         );
     }

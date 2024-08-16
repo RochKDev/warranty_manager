@@ -92,6 +92,20 @@ public class GlobalExceptionHandler {
         );
     }
 
+    @ResponseStatus(HttpStatus.FORBIDDEN)
+    @ExceptionHandler(value = UnauthorizedResourceAccess.class)
+    public ApiErrorResponse handleUnauthorizedResourceAccess(UnauthorizedResourceAccess ex,
+                                                    HttpServletRequest request,
+                                                    HandlerMethod method) {
+        return new ApiErrorResponse(
+                HttpStatus.FORBIDDEN,
+                ex.getMessage(),
+                request.getRequestURI(),
+                method.getMethod().getName(),
+                ZonedDateTime.now()
+        );
+    }
+
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ValidationErrorResponse handleValidationExceptions(MethodArgumentNotValidException ex,

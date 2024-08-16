@@ -16,7 +16,10 @@ import java.util.List;
 @AllArgsConstructor
 @Builder
 @Table(
-        uniqueConstraints = @UniqueConstraint(columnNames = {"shopName", "reference"})
+        // make the shopname and reference unique for each user
+        uniqueConstraints = {
+                @UniqueConstraint(columnNames = {"shopName", "reference", "user_id"})
+        }
 )
 public class ProofOfPurchase {
 
@@ -37,8 +40,8 @@ public class ProofOfPurchase {
 
     private String description;
 
-//    @ManyToOne
-//    User user; // TODO implement authentication
+    @ManyToOne
+    User user;
 
     @OneToMany(mappedBy = "proofOfPurchase", cascade = CascadeType.ALL)
     private List<Product> products = new ArrayList<>();
