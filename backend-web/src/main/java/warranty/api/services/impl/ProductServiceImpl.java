@@ -19,9 +19,7 @@ import warranty.api.repository.ProofOfPurchaseRepository;
 import warranty.api.repository.UserRepository;
 import warranty.api.services.ProductService;
 
-import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 @Service
 @Slf4j

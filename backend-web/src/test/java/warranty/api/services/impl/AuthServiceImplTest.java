@@ -18,17 +18,20 @@ import warranty.api.model.dto.UserDto;
 import warranty.api.model.responses.JwtResponseDto;
 import warranty.api.repository.UserRepository;
 import warranty.api.security.jwt.JwtUtils;
-import warranty.api.services.impl.AuthServiceImpl;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
+/**
+ * Unit tests for the {@link AuthServiceImpl} class.
+ * This class tests the behavior of methods for authenticating and registering users.
+ */
 @ExtendWith(MockitoExtension.class)
 class AuthServiceImplTest {
 
-    AuthServiceImpl underTest;
+    private AuthServiceImpl underTest;
 
     @Mock
     private UserRepository userRepository;
@@ -45,50 +48,58 @@ class AuthServiceImplTest {
     @Captor
     private ArgumentCaptor<User> userArgumentCaptor;
 
+    /**
+     * Set up the test environment by initializing the service with mocked dependencies.
+     */
     @BeforeEach
     void setUp() {
         underTest = new AuthServiceImpl(authenticationManager, jwtUtils, userRepository, passwordEncoder);
     }
 
+    /**
+     * Test the successful authentication of a user.
+     * Ensures the authentication manager and JWT utils are called with the correct arguments,
+     * and a JWT token is returned.
+     */
     @Test
     void shouldAuthenticateUser() {
-        // Given : Login request
+        // Given: A login request with valid credentials.
         LoginRequestDto loginRequestDto = new LoginRequestDto("test@example.com", "password");
 
-        // Mock the authentication object
+        // Mock the authentication object and JWT token generation.
         Authentication authentication = mock(Authentication.class);
         when(authenticationManager.authenticate(any(UsernamePasswordAuthenticationToken.class)))
                 .thenReturn(authentication);
-        // Mock the jwt token
         when(jwtUtils.generateJwtTokenForUser(authentication)).thenReturn("jwt-token");
 
-        // When - method under test
+        // When: The authenticateUser method is called. (method under test)
         JwtResponseDto jwtResponse = underTest.authenticateUser(loginRequestDto);
 
-        // Then
-        // Verify that the authentication manager was called with the correct arguments
+        // Then: Verify that the authentication manager was called with the correct arguments,
+        // and the JWT token was generated and returned.
         verify(authenticationManager).authenticate(any(UsernamePasswordAuthenticationToken.class));
-        // Verify that the jwt token was generated
         verify(jwtUtils).generateJwtTokenForUser(authentication);
-        // Verify that the jwt token was returned
         assertThat(jwtResponse.getToken()).isEqualTo("jwt-token");
     }
 
+    /**
+     * Test the successful registration of a new user.
+     * Ensures the user repository's save method is called with the correct arguments,
+     * and the user's password is encoded.
+     */
     @Test
     void shouldRegisterUser() {
-        // Given : UserDto
+        // Given: A user DTO with valid details.
         UserDto userDto = new UserDto("John Doe", "john.doe@example.com", "password");
 
-        // Mock the user repository to return false when checking if the email is taken
+        // Mock the user repository and password encoder.
         when(userRepository.existsByEmail(userDto.email())).thenReturn(false);
-        // Mock the password encoder to return the "encoded password"
         when(passwordEncoder.encode(userDto.password())).thenReturn("encoded-password");
 
-        // When - method under test
+        // When: The registerUser method is called. (method under test)
         underTest.registerUser(userDto);
 
-        // Then
-        // Verify that the user was saved
+        // Then: Verify that the user was saved with the correct details.
         verify(userRepository).save(userArgumentCaptor.capture());
         User capturedUser = userArgumentCaptor.getValue();
         assertThat(capturedUser.getName()).isEqualTo(userDto.name());
@@ -96,20 +107,24 @@ class AuthServiceImplTest {
         assertThat(capturedUser.getPassword()).isEqualTo("encoded-password");
     }
 
+    /**
+     * Test that a {@link UserEmailUnavailableException} is thrown when trying to register
+     * a user with an email that is already taken.
+     */
     @Test
     void shouldThrowExceptionWhenEmailIsTaken() {
-        // Given : UserDto
+        // Given: A user DTO with an email that is already taken.
         UserDto userDto = new UserDto("John Doe", "john.doe@example.com", "password");
 
-        // Mock the user repository to return true when checking if the email is taken
+        // Mock the user repository to return true when checking if the email is taken.
         when(userRepository.existsByEmail(userDto.email())).thenReturn(true);
 
-        // when & then - method under test
-        // Verify that the UserEmailUnavailableException is thrown when the email is taken
+        // When / Then: Assert that registering a user with a taken email throws an exception.
         assertThatThrownBy(() -> underTest.registerUser(userDto))
                 .isInstanceOf(UserEmailUnavailableException.class)
                 .hasMessageContaining("User with email " + userDto.email() + " already exists");
 
+        // Verify that the user repository's save method is never called.
         verify(userRepository, never()).save(any());
     }
 }
