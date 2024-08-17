@@ -44,33 +44,33 @@ class UserRepositoryTest extends AbstractTestcontainersTest {
 
     @Test
     void shouldReturnUserWhenFindByEmail() {
-        // when
+        // When : Find user by email
         Optional<User> userByEmail = userRepository.findByEmail(EMAIL);
-        // then
+        // Then : User is present
         assertTrue(userByEmail.isPresent());
     }
 
     @Test
     void shouldNotReturnUserWhenFindByEmail() {
-        // when
+        // When : Find user by email
         Optional<User> userByEmail = userRepository.findByEmail("test@gmail.com");
-        // then
+        // Then : User is not present
         assertThat(userByEmail).isNotPresent();
     }
 
     @Test
     void shouldReturnTrueWhenExistsByEmail() {
-        // when
+        // When : Check if user exists by email
         boolean existsByEmail = userRepository.existsByEmail(EMAIL);
-        // then
+        // Then : User exists
         assertTrue(existsByEmail);
     }
 
     @Test
     void shouldReturnFalseWhenExistsByEmail() {
-        // when
-        boolean existsByEmail = userRepository.existsByEmail("test@gmail.com");
-        // then
+        // When : Check if user exists by email
+        boolean existsByEmail = userRepository.existsByEmail("non.existant.email@gmail.com");
+        // Then : User does not exist
         assertFalse(existsByEmail);
     }
 }

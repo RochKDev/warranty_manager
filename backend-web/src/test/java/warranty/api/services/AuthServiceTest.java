@@ -53,7 +53,7 @@ class AuthServiceTest {
 
     @Test
     void shouldAuthenticateUser() {
-        // Given
+        // Given : Login request
         LoginRequestDto loginRequestDto = new LoginRequestDto("test@example.com", "password");
 
         // Mock the authentication object
@@ -77,7 +77,7 @@ class AuthServiceTest {
 
     @Test
     void shouldRegisterUser() {
-        // Given
+        // Given : UserDto
         UserDto userDto = new UserDto("John Doe", "john.doe@example.com", "password");
 
         // Mock the user repository to return false when checking if the email is taken
@@ -99,7 +99,7 @@ class AuthServiceTest {
 
     @Test
     void shouldThrowExceptionWhenEmailIsTaken() {
-        // Given
+        // Given : UserDto
         UserDto userDto = new UserDto("John Doe", "john.doe@example.com", "password");
 
         // Mock the user repository to return true when checking if the email is taken

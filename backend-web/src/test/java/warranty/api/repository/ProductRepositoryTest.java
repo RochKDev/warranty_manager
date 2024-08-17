@@ -6,14 +6,13 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
-import org.springframework.boot.testcontainers.service.connection.ServiceConnection;
-import org.testcontainers.containers.MySQLContainer;
-import org.testcontainers.junit.jupiter.Container;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.testcontainers.junit.jupiter.Testcontainers;
-import org.testcontainers.utility.DockerImageName;
 import warranty.api.AbstractTestcontainersTest;
 import warranty.api.model.Product;
 import warranty.api.model.ProofOfPurchase;
+import warranty.api.model.User;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -31,11 +30,26 @@ class ProductRepositoryTest extends AbstractTestcontainersTest {
     @Autowired
     private ProofOfPurchaseRepository proofOfPurchaseRepository;
 
-    private static final String SHOP_NAME = "TopAchat";
+    @Autowired
+    private UserRepository userRepository;
+
+    private static final String SHOP_NAME = "MediaMarkt BE";
     private static final String REFERENCE = "12345ABKUYU878";
+    private Long userId;
 
     @BeforeEach
     void setUp() {
+        // Create a User instance
+        User user = User.builder()
+                .name("John Doe")
+                .password("123456")
+                .email("john.doe@gmail.com")
+                .build();
+
+        // Save the User instance and retrieve its ID
+        user = userRepository.save(user);
+        userId = user.getId();
+
         // Create a ProofOfPurchase instance
         ProofOfPurchase proofOfPurchase = ProofOfPurchase.builder()
                 .shopName(SHOP_NAME)
@@ -43,7 +57,11 @@ class ProductRepositoryTest extends AbstractTestcontainersTest {
                 .buyDate(LocalDate.of(2024, 8, 9))
                 .warrantyEndDate(LocalDate.of(2026, 8, 9))
                 .description("Purchase gaming components")
+                .user(user)
                 .build();
+
+        // Associate the ProofOfPurchase instance with the User instance
+        user.setProofOfPurchases(List.of(proofOfPurchase));
         proofOfPurchaseRepository.save(proofOfPurchase);
 
         // Create a Product instance
@@ -52,6 +70,7 @@ class ProductRepositoryTest extends AbstractTestcontainersTest {
                 .description("Gaming graphic card")
                 .proofOfPurchase(proofOfPurchase)
                 .build();
+
         productRepository.save(product);
     }
 
@@ -59,26 +78,27 @@ class ProductRepositoryTest extends AbstractTestcontainersTest {
     void tearDown() {
         productRepository.deleteAll();
         proofOfPurchaseRepository.deleteAll();
+        userRepository.deleteAll();
     }
 
     @Test
-    void shouldFindByProofOfPurchaseShopNameAndReference() {
-        // when
-        List<Product> products =
-                productRepository.findByProofOfPurchase_ShopNameAndProofOfPurchase_Reference(SHOP_NAME, REFERENCE);
+    void shouldFindByProofOfPurchaseAndUserId() {
+        // When : Find all products by proof of purchase and user ID
+        Pageable pageable = Pageable.unpaged();
+        Page<Product> products = productRepository.findByProofOfPurchase_User_Id(userId, pageable);
 
-        // then
+        // Then : Assert that the product is found and the name is correct
         assertThat(products).hasSize(1);
-        assertThat(products.getFirst().getName()).isEqualTo("NVIDIA RTX 3090");
+        assertThat(products.getContent().getFirst().getName()).isEqualTo("NVIDIA RTX 3090");
     }
 
     @Test
-    void shouldNotFindProductIfProofOfPurchaseDoesNotExist() {
-        // when
-        List<Product> products
-                = productRepository.findByProofOfPurchase_ShopNameAndProofOfPurchase_Reference("NonExistentStore", "00000");
+    void shouldNotFindByProofOfPurchaseAndUserId() {
+        // When : Find all products by proof of purchase and user ID
+        Pageable pageable = Pageable.unpaged();
+        Page<Product> products = productRepository.findByProofOfPurchase_User_Id(100L, pageable);
 
-        // then
+        // Then : Assert that the product is not found
         assertThat(products).isEmpty();
     }
 }
