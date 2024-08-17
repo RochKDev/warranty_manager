@@ -16,16 +16,14 @@ import warranty.api.model.User;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Optional;
 
-import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.*;
 
 @DataJpaTest
 @Testcontainers
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
-class ProductRepositoryTest extends AbstractTestcontainersTest {
-
-    @Autowired
-    private ProductRepository productRepository;
+class ProofOfPurchaseRepositoryTest extends AbstractTestcontainersTest {
 
     @Autowired
     private ProofOfPurchaseRepository proofOfPurchaseRepository;
@@ -35,6 +33,7 @@ class ProductRepositoryTest extends AbstractTestcontainersTest {
 
     private static final String SHOP_NAME = "MediaMarkt BE";
     private static final String REFERENCE = "12345ABKUYU878";
+
     private Long userId;
 
     @BeforeEach
@@ -60,10 +59,6 @@ class ProductRepositoryTest extends AbstractTestcontainersTest {
                 .user(user)
                 .build();
 
-        // Associate the ProofOfPurchase instance with the User instance
-        user.setProofOfPurchases(List.of(proofOfPurchase));
-        proofOfPurchaseRepository.save(proofOfPurchase);
-
         // Create a Product instance
         Product product = Product.builder()
                 .name("NVIDIA RTX 3090")
@@ -71,34 +66,61 @@ class ProductRepositoryTest extends AbstractTestcontainersTest {
                 .proofOfPurchase(proofOfPurchase)
                 .build();
 
-        productRepository.save(product);
+        // Associate the Product instance with the ProofOfPurchase instance
+        proofOfPurchase.setProducts(List.of(product));
+
+        proofOfPurchaseRepository.save(proofOfPurchase);
     }
 
     @AfterEach
     void tearDown() {
-        productRepository.deleteAll();
         proofOfPurchaseRepository.deleteAll();
         userRepository.deleteAll();
     }
 
     @Test
-    void shouldFindUserId() {
-        // When : Find all products by user ID
+    void shouldFindByUserId() {
+        // When :
         Pageable pageable = Pageable.unpaged();
-        Page<Product> products = productRepository.findByProofOfPurchase_User_Id(userId, pageable);
+        Page<ProofOfPurchase> proofOfPurchases = proofOfPurchaseRepository.findByUser_Id(userId, pageable);
 
-        // Then : Assert that the product is found and the name is correct
-        assertThat(products).hasSize(1);
-        assertThat(products.getContent().getFirst().getName()).isEqualTo("NVIDIA RTX 3090");
+        // Then :
+        assertEquals(1, proofOfPurchases.getTotalElements());
+        assertEquals(SHOP_NAME, proofOfPurchases.getContent().getFirst().getShopName());
+        assertEquals(REFERENCE, proofOfPurchases.getContent().getFirst().getReference());
     }
 
     @Test
     void shouldNotFindByUserId() {
-        // When : Find all products by user ID
+        // When :
         Pageable pageable = Pageable.unpaged();
-        Page<Product> products = productRepository.findByProofOfPurchase_User_Id(100L, pageable);
+        Page<ProofOfPurchase> proofOfPurchases = proofOfPurchaseRepository.findByUser_Id(0L, pageable);
 
-        // Then : Assert that the product is not found
-        assertThat(products).isEmpty();
+        // Then :
+        assertEquals(0, proofOfPurchases.getTotalElements());
+    }
+
+    @Test
+    void shouldFindByShopNameAndReferenceAndUserId() {
+        // When :
+        Optional<ProofOfPurchase> proofOfPurchase = proofOfPurchaseRepository.findByShopNameAndReferenceAndUser_Id(
+                SHOP_NAME, REFERENCE, userId);
+
+        ProofOfPurchase existingProofOfPurchase = proofOfPurchase.get();
+
+        // Then :
+        assertNotNull(existingProofOfPurchase);
+        assertEquals(SHOP_NAME, existingProofOfPurchase.getShopName());
+        assertEquals(REFERENCE, existingProofOfPurchase.getReference());
+    }
+
+    @Test
+    void shouldNotFindByShopNameAndReferenceAndUserId() {
+        // When :
+        Optional<ProofOfPurchase> proofOfPurchase = proofOfPurchaseRepository.findByShopNameAndReferenceAndUser_Id(
+                "Random Shop Name", "1314848AZAZAZ", userId);
+
+        // Then :
+        assertTrue(proofOfPurchase.isEmpty());
     }
 }
