@@ -14,8 +14,6 @@ public interface ProductService {
 
     Page<ProductResponseDto> findAll(UserDetails userDetails, Pageable pageable);
 
-    List<ProductResponseDto> findByShopNameAndReference(final String shopName, final String reference);
-
     ProductResponseDto findOneById(final Long id, UserDetails userDetails);
 
     ProductResponseDto update(final Long id, ProductDto productDto, UserDetails userDetails);

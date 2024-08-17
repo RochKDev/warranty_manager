@@ -10,7 +10,5 @@ import java.util.List;
 @Repository
 public interface ProductRepository extends JpaRepository<Product, Long> {
 
-    List<Product> findByProofOfPurchase_ShopNameAndProofOfPurchase_Reference(String shopName, String reference);
-
     Page<Product> findByProofOfPurchase_User_Id(Long userId, Pageable pageable);
 }

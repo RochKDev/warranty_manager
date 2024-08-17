@@ -67,8 +67,8 @@ public class ProofOfPurchaseServiceImpl implements ProofOfPurchaseService {
         // Convert the product DTOs to Product entities and set the proofOfPurchase for each product
         List<Product> productList = proofOfPurchaseDto.products().stream()
                 .map(productDto -> Product.builder()
-                        .name(productDto.name())
-                        .description(productDto.description())
+                        .name(productDto.getName())
+                        .description(productDto.getDescription())
                         .proofOfPurchase(proofOfPurchase) // Set the proofOfPurchase here
                         .build())
                 .toList();

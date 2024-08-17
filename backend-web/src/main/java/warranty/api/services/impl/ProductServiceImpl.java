@@ -42,7 +42,7 @@ public class ProductServiceImpl implements ProductService {
     @Override
     public ProductResponseDto save(ProductDto productDto, UserDetails userDetails) {
         User user = getUserFromUserDetails(userDetails);
-        ProofOfPurchase proofOfPurchase = getValidProofOfPurchase(productDto.proofOfPurchaseId(), user);
+        ProofOfPurchase proofOfPurchase = getValidProofOfPurchase(productDto.getProofOfPurchaseId(), user);
 
         Product product = buildProductFromDto(productDto, proofOfPurchase);
 
@@ -64,16 +64,6 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
-    public List<ProductResponseDto> findByShopNameAndReference(String shopName, String reference) {
-        log.debug("Finding products with shop name {} and reference {}", shopName, reference);
-
-        return productRepository.findByProofOfPurchase_ShopNameAndProofOfPurchase_Reference(shopName, reference)
-                .stream()
-                .map(ProductResponseDto::fromEntity)
-                .collect(Collectors.toList());
-    }
-
-    @Override
     public ProductResponseDto findOneById(Long id, UserDetails userDetails) {
         User user = getUserFromUserDetails(userDetails);
         Product product = getAuthorizedProduct(id, user);
@@ -86,7 +76,7 @@ public class ProductServiceImpl implements ProductService {
     @Override
     public ProductResponseDto update(Long id, ProductDto productDto, UserDetails userDetails) {
         User user = getUserFromUserDetails(userDetails);
-        ProofOfPurchase proofOfPurchase = getValidProofOfPurchase(productDto.proofOfPurchaseId(), user);
+        ProofOfPurchase proofOfPurchase = getValidProofOfPurchase(productDto.getProofOfPurchaseId(), user);
         Product existingProduct = getAuthorizedProduct(id, user);
 
         updateProductFromDto(existingProduct, productDto, proofOfPurchase);
@@ -146,16 +136,16 @@ public class ProductServiceImpl implements ProductService {
     // Helper method to build product from DTO
     private Product buildProductFromDto(ProductDto productDto, ProofOfPurchase proofOfPurchase) {
         return Product.builder()
-                .name(productDto.name())
-                .description(productDto.description())
+                .name(productDto.getName())
+                .description(productDto.getDescription())
                 .proofOfPurchase(proofOfPurchase)
                 .build();
     }
 
     // Helper method to update product from DTO
     private void updateProductFromDto(Product product, ProductDto productDto, ProofOfPurchase proofOfPurchase) {
-        product.setName(productDto.name());
-        product.setDescription(productDto.description());
+        product.setName(productDto.getName());
+        product.setDescription(productDto.getDescription());
         product.setProofOfPurchase(proofOfPurchase);
     }
 }
