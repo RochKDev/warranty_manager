@@ -6,6 +6,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
+import org.springframework.test.annotation.DirtiesContext;
 import org.testcontainers.junit.jupiter.Testcontainers;
 import warranty.api.AbstractTestcontainersTest;
 import warranty.api.model.User;
@@ -19,6 +20,11 @@ import static org.junit.jupiter.api.Assertions.*;
 @DataJpaTest
 @Testcontainers
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
+// This annotation tells Spring to reset the application context after each test method in the class.
+// This will also force Spring to recreate the connection pool, ensuring that no stale or closed connections
+// are used across different test methods.
+// Reason to use this -> Testcontainers for some reason resets the database container after each test class.
+@DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
 class UserRepositoryTest extends AbstractTestcontainersTest {
 
     @Autowired
