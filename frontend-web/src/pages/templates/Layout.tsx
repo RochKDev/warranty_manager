@@ -4,7 +4,7 @@ import {Footer} from "../../components/Footer.tsx";
 
 export const Layout = () => {
     return (
-        <div>
+        <div className="m-0">
             <Navbar />
             <Outlet />
             <Footer />

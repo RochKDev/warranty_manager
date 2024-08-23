@@ -1,47 +1,56 @@
-import {Menubar} from 'primereact/menubar';
-import {MenuItem} from 'primereact/menuitem';
-import {Button} from 'primereact/button';
-import {PrimeIcons} from 'primereact/api';
-
-import 'primeicons/primeicons.css';
-import {useState} from "react";
-
+import { Menubar } from 'primereact/menubar';
+import { Button } from 'primereact/button';
+import { useState } from 'react';
+import { LoginModal } from './modals/LoginModal';
+import { RegisterModal } from './modals/RegisterModal';
 
 export const Navbar = () => {
-    const [receipt, setReceipt] = useState<string>("Receipts");
-    const [product, setProduct] = useState<string>("Products");
+    const [isLoginVisible, setLoginVisible] = useState(false);
+    const [isRegisterVisible, setRegisterVisible] = useState(false);
 
-    const items: MenuItem[] = [
+    const items = [
         {
             label: 'Warranty Manager',
-            icon: PrimeIcons.HOME,
+            icon: 'pi pi-home',
         },
         {
             label: 'Dashboard',
-            icon: 'pi pi-objects-column'
+            icon: 'pi pi-objects-column',
         },
         {
             label: 'Contact',
             icon: 'pi pi-envelope',
             disabled: true,
-            visible : false
-        }
+            visible: false,
+        },
     ];
 
-    const start = (
-        <div>
-            <i className="pi pi-bars"></i>
-        </div>
-    );
-    const end = (
-        <div className="flex align-items-center gap-2">
-            <Button label="Sign Up"/>
-        </div>
-    );
+    const start = <i className="pi pi-bars"></i>;
+    const end = <Button label="Sign Up" onClick={() => setLoginVisible(true)} />;
+
+    const switchToRegister = () => {
+        setLoginVisible(false);
+        setRegisterVisible(true);
+    };
+
+    const switchToLogin = () => {
+        setRegisterVisible(false);
+        setLoginVisible(true);
+    };
 
     return (
         <div className="w-full">
-            <Menubar className="w-full justify-center" model={items} start={start} end={end}/>
+            <Menubar className="w-full justify-center" model={items} start={start} end={end} />
+            <LoginModal
+                visible={isLoginVisible}
+                onClose={() => setLoginVisible(false)}
+                onSwitchToRegister={switchToRegister}
+            />
+            <RegisterModal
+                visible={isRegisterVisible}
+                onClose={() => setRegisterVisible(false)}
+                onSwitchToLogin={switchToLogin}
+            />
         </div>
-    )
-}
+    );
+};

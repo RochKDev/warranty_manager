@@ -1,0 +1,63 @@
+.login-dialog .p-dialog-content {
+    background-color: white;
+}
+
+.login-container {
+    display: flex;
+    flex-direction: column;
+    padding: 10px;
+    gap: 8px;
+}
+
+
+.input-group {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.input-label {
+    color: #555;
+    font-weight: 600;
+}
+
+
+.button-signin {
+    background-color: #007bff;
+    color: white;
+    padding: 10px 20px;
+    border-radius: 5px;
+    border: none;
+    cursor: pointer;
+}
+
+.button-signin:hover {
+    background-color: #0056b3;
+}
+
+.button-cancel {
+    background-color: #dc3545;
+    color: white;
+    padding: 10px 20px;
+    border-radius: 5px;
+    border: none;
+    cursor: pointer;
+}
+
+.button-cancel:hover {
+    background-color: #c82333;
+}
+
+.register-link {
+    text-align: center;
+}
+
+.link {
+    color: #007bff;
+    text-decoration: none;
+    cursor: pointer;
+}
+
+.link:hover {
+    text-decoration: underline;
+}
