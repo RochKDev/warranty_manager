@@ -3,7 +3,7 @@ import { useContext } from 'react';
 import { AuthContext } from '../contexts/AuthProvider';
 
 const axiosClient = axios.create({
-    baseURL: '',
+    baseURL: 'http://localhost:8080/api/v1',
 });
 
 axiosClient.interceptors.request.use((config) => {

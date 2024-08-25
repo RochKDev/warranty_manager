@@ -14,7 +14,7 @@ export const AuthContext = createContext<AuthContextProps>({
 });
 
 
-export const AuthProvider = ({ children }: ReactNode) => {
+export const AuthProvider = ({ children }) => {
     const [user, setUser] = useState<JwtPayload | null>(null);
 
 
