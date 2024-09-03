@@ -4,7 +4,10 @@ import jakarta.validation.constraints.NotBlank;
 
 import jakarta.validation.constraints.Email;
 
-public record UserDto (
+/**
+ * This class contains the user data.
+ */
+public record UserDto(
         @NotBlank(message = "Name is required")
         String name,
 
@@ -14,4 +17,5 @@ public record UserDto (
 
         @NotBlank(message = "Password is required")
         String password
-) {}
+) {
+}

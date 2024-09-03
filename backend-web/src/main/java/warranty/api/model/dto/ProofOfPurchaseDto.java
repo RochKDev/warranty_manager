@@ -3,19 +3,23 @@ package warranty.api.model.dto;
 import java.time.LocalDate;
 import java.util.List;
 
-public record ProofOfPurchaseDto (
+/**
+ * This class contains the proof of purchase data.
+ */
+public record ProofOfPurchaseDto(
 
-    String shopName,
+        String shopName,
 
-    String reference,
+        String reference,
 
-    LocalDate buyDate,
+        LocalDate buyDate,
 
-    LocalDate warrantyEndDate,
+        LocalDate warrantyEndDate,
 
 //    Blob receiptImage,
 
-    String description,
+        String description,
 
-    List<ProductDto> products
-){}
+        List<ProductDto> products
+) {
+}
