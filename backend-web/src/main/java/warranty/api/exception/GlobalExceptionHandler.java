@@ -14,9 +14,20 @@ import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
+/**
+ * This class is used to handle exceptions globally.
+ */
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
+    /**
+     * This method is used to handle the ProductNotFoundException exception.
+     *
+     * @param ex      The exception.
+     * @param request The request.
+     * @param method  The method.
+     * @return The ApiErrorResponse.
+     */
     @ResponseStatus(HttpStatus.NOT_FOUND)
     @ExceptionHandler(value = ProductNotFoundException.class)
     public ApiErrorResponse handleCustomerNotFoundException(ProductNotFoundException ex,
@@ -32,6 +43,14 @@ public class GlobalExceptionHandler {
         );
     }
 
+    /**
+     * This method is used to handle the ProofOfPurchaseNotFoundException exception.
+     *
+     * @param ex      The exception.
+     * @param request The request.
+     * @param method  The method.
+     * @return The ApiErrorResponse.
+     */
     @ResponseStatus(HttpStatus.NOT_FOUND)
     @ExceptionHandler(value = ProofOfPurchaseNotFoundException.class)
     public ApiErrorResponse handleProofOfPurchaseNotFound(ProofOfPurchaseNotFoundException ex,
@@ -47,6 +66,14 @@ public class GlobalExceptionHandler {
         );
     }
 
+    /**
+     * This method is used to handle the ProofOfPurchaseConflictException exception.
+     *
+     * @param ex      The exception.
+     * @param request The request.
+     * @param method  The method.
+     * @return The ApiErrorResponse.
+     */
     @ResponseStatus(HttpStatus.CONFLICT)
     @ExceptionHandler(value = ProofOfPurchaseConflictException.class)
     public ApiErrorResponse handleProofOfPurchaseConflict(ProofOfPurchaseConflictException ex,
@@ -62,6 +89,14 @@ public class GlobalExceptionHandler {
         );
     }
 
+    /**
+     * This method is used to handle the UserEmailUnavailableException exception.
+     *
+     * @param ex      The exception.
+     * @param request The request.
+     * @param method  The method.
+     * @return The ApiErrorResponse.
+     */
     @ResponseStatus(HttpStatus.CONFLICT)
     @ExceptionHandler(value = UserEmailUnavailableException.class)
     public ApiErrorResponse handleUserEmailUnavailable(UserEmailUnavailableException ex,
@@ -77,6 +112,14 @@ public class GlobalExceptionHandler {
         );
     }
 
+    /**
+     * This method is used to handle the UserEmailNotFoundException exception.
+     *
+     * @param ex      The exception.
+     * @param request The request.
+     * @param method  The method.
+     * @return The ApiErrorResponse.
+     */
     @ResponseStatus(HttpStatus.NOT_FOUND)
     @ExceptionHandler(value = UserEmailNotFoundException.class)
     public ApiErrorResponse handleUserEmailNotFound(UserEmailNotFoundException ex,
@@ -92,11 +135,19 @@ public class GlobalExceptionHandler {
         );
     }
 
+    /**
+     * This method is used to handle the UnauthorizedResourceAccess exception.
+     *
+     * @param ex      The exception.
+     * @param request The request.
+     * @param method  The method.
+     * @return The ApiErrorResponse.
+     */
     @ResponseStatus(HttpStatus.FORBIDDEN)
     @ExceptionHandler(value = UnauthorizedResourceAccess.class)
     public ApiErrorResponse handleUnauthorizedResourceAccess(UnauthorizedResourceAccess ex,
-                                                    HttpServletRequest request,
-                                                    HandlerMethod method) {
+                                                             HttpServletRequest request,
+                                                             HandlerMethod method) {
         return new ApiErrorResponse(
                 HttpStatus.FORBIDDEN,
                 ex.getMessage(),
@@ -106,6 +157,14 @@ public class GlobalExceptionHandler {
         );
     }
 
+    /**
+     * This method is used to handle the MethodArgumentNotValidException exception.
+     *
+     * @param ex      The exception.
+     * @param request The request.
+     * @param method  The method.
+     * @return The ValidationErrorResponse.
+     */
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ValidationErrorResponse handleValidationExceptions(MethodArgumentNotValidException ex,
