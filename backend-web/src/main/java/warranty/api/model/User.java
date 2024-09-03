@@ -10,6 +10,9 @@ import jakarta.validation.constraints.NotBlank;
 
 import java.util.List;
 
+/**
+ * This class represents the user entity in the database.
+ */
 @Entity
 @Data
 @AllArgsConstructor

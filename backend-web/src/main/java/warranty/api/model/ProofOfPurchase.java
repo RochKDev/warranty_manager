@@ -10,13 +10,16 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * This class represents the proof of purchase entity in the database.
+ */
 @Entity
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
 @Table(
-        // make the shopname and reference unique for each user
+        // make the shopName and reference unique for each user
         uniqueConstraints = {
                 @UniqueConstraint(columnNames = {"shopName", "reference", "user_id"})
         }

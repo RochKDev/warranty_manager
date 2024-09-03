@@ -7,7 +7,9 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-
+/**
+ * This class represents the product entity in the database.
+ */
 @Entity
 @Data
 @AllArgsConstructor
