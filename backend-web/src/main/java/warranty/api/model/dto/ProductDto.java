@@ -4,12 +4,14 @@ package warranty.api.model.dto;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 /**
  * This class contains the product data.
  */
 @Data
 @AllArgsConstructor
+@NoArgsConstructor
 @Builder
 public class ProductDto {
 
