@@ -4,6 +4,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import warranty.api.model.Image;
 import warranty.api.repository.ImageRepository;
+import warranty.api.utils.ImageUtils;
+
+import java.io.IOException;
+import java.util.Optional;
 
 @Service
 public class ImageServiceImpl {
@@ -14,12 +18,20 @@ public class ImageServiceImpl {
         this.imageRepository = imageRepository;
     }
 
-    public String uploadImage(MultipartFile file) {
-        imageRepository.save(Image.builder()
+    public String uploadImage(MultipartFile file) throws IOException {
+         Image image = imageRepository.save(Image.builder()
                 .name(file.getOriginalFilename())
                 .type(file.getContentType())
-                .data(file.getBytes())
+                .data(ImageUtils.compressImage(file.getBytes()))
                 .build());
+         if(image != null) {
+             return "Image uploaded successfully" + file.getOriginalFilename();
+         }
+         return null;
+    }
+    public byte[] downloadImage(String name) {
+        Optional<Image> image = imageRepository.findByName(name);
+        return image.map(value -> ImageUtils.decompressImage(value.getData())).orElse(null);
     }
 
 }
