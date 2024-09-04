@@ -12,8 +12,12 @@ import warranty.api.services.ImageService;
 @RestController
 @RequestMapping(path = "api/v1/images")
 public class ImageController {
-    @Autowired
-    private ImageService imageService;
+
+    private final ImageService imageService;
+
+    public ImageController(ImageService imageService) {
+        this.imageService = imageService;
+    }
 
     @PostMapping
     public ResponseEntity<?> uploadImage(@RequestParam("file") MultipartFile file) {
