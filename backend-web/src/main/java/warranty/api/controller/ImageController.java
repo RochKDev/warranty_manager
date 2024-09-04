@@ -6,13 +6,14 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
-import warranty.api.services.impl.ImageServiceImpl;
+import warranty.api.services.ImageService;
+
 
 @RestController
 @RequestMapping(path = "api/v1/images")
 public class ImageController {
     @Autowired
-    private ImageServiceImpl imageService;
+    private ImageService imageService;
 
     @PostMapping
     public ResponseEntity<?> uploadImage(@RequestParam("file") MultipartFile file) {
