@@ -1,5 +1,6 @@
 package warranty.api.services.impl;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import warranty.api.model.Image;
@@ -12,7 +13,8 @@ import java.util.Optional;
 @Service
 public class ImageServiceImpl {
 
-    private final ImageRepository imageRepository;
+    @Autowired
+    private ImageRepository imageRepository;
 
     public ImageServiceImpl(ImageRepository imageRepository) {
         this.imageRepository = imageRepository;
@@ -29,10 +31,7 @@ public class ImageServiceImpl {
         } catch (IOException e) {
             throw new RuntimeException(e);//TODO treat this exception correctly
         }
-        if(image != null) {
-             return "Image uploaded successfully" + file.getOriginalFilename();
-         }
-         return null;
+        return "Image uploaded successfully : " + file.getOriginalFilename();
     }
     public byte[] downloadImage(String name) {
         Optional<Image> image = imageRepository.findByName(name);
