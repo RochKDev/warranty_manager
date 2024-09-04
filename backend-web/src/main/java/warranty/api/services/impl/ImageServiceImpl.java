@@ -18,13 +18,18 @@ public class ImageServiceImpl {
         this.imageRepository = imageRepository;
     }
 
-    public String uploadImage(MultipartFile file) throws IOException {
-         Image image = imageRepository.save(Image.builder()
-                .name(file.getOriginalFilename())
-                .type(file.getContentType())
-                .data(ImageUtils.compressImage(file.getBytes()))
-                .build());
-         if(image != null) {
+    public String uploadImage(MultipartFile file) {
+        Image image = null;
+        try {
+            image = imageRepository.save(Image.builder()
+                   .name(file.getOriginalFilename())
+                   .type(file.getContentType())
+                   .data(ImageUtils.compressImage(file.getBytes()))
+                   .build());
+        } catch (IOException e) {
+            throw new RuntimeException(e);//TODO treat this exception correctly
+        }
+        if(image != null) {
              return "Image uploaded successfully" + file.getOriginalFilename();
          }
          return null;
