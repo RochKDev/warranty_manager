@@ -7,6 +7,7 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.method.HandlerMethod;
+import org.springframework.web.multipart.MaxUploadSizeExceededException;
 import warranty.api.exception.validation.MessageError;
 import warranty.api.exception.validation.ValidationErrorResponse;
 
@@ -153,6 +154,20 @@ public class GlobalExceptionHandler {
                 ex.getMessage(),
                 request.getRequestURI(),
                 method.getMethod().getName(),
+                ZonedDateTime.now()
+        );
+    }
+
+
+    @ResponseStatus(HttpStatus.PAYLOAD_TOO_LARGE)
+    @ExceptionHandler(value = MaxUploadSizeExceededException.class)
+    public ApiErrorResponse handleFileUploadSizeExceeded(MaxUploadSizeExceededException ex,
+                                                             HttpServletRequest request) {
+        return new ApiErrorResponse(
+                HttpStatus.PAYLOAD_TOO_LARGE,
+                ex.getMessage(),
+                request.getRequestURI(),
+                "",
                 ZonedDateTime.now()
         );
     }
